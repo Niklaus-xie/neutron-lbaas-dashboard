@@ -27,7 +27,7 @@
     beforeEach(module('horizon.dashboard.project.lbaasv2'));
 
     describe('CertificatesController', function() {
-      var ctrl, scope;
+      var ctrl, scope, modal;
 
       beforeEach(inject(function($controller) {
         scope = {
@@ -38,7 +38,8 @@
             certificates: certs
           }
         };
-        ctrl = $controller('CertificatesController', { $scope: scope });
+        modal = { open: angular.noop };
+        ctrl = $controller('CertificatesController', { $scope: scope, $modal: modal });
       }));
 
       it('should define transfer table properties', function() {
