@@ -97,7 +97,8 @@
        */
 
       initialize: initialize,
-      submit: submit
+      submit: submit,
+      prepareCertificates: prepareCertificates
     };
 
     return model;
@@ -184,15 +185,15 @@
       }
 
       var promise = {
-        'createloadbalancer': initCreateLoadBalancer,
-        'createlistener': initCreateListener,
-        'createpool': initCreatePool,
-        'createmonitor': initCreateMonitor,
-        'createmembers': initUpdateMemberList,
-        'editloadbalancer': initEditLoadBalancer,
-        'editlistener': initEditListener,
-        'editpool': initEditPool,
-        'editmonitor': initEditMonitor
+        createloadbalancer: initCreateLoadBalancer,
+        createlistener: initCreateListener,
+        createpool: initCreatePool,
+        createmonitor: initCreateMonitor,
+        createmembers: initUpdateMemberList,
+        editloadbalancer: initEditLoadBalancer,
+        editlistener: initEditListener,
+        editpool: initEditPool,
+        editmonitor: initEditMonitor
       }[type](keymanagerPromise);
 
       return promise.then(onInitSuccess, onInitFail);
@@ -529,7 +530,7 @@
         member.address = member.addresses[0];
 
         if (model.spec.pool.protocol) {
-          member.port = {'HTTP': 80}[model.spec.pool.protocol];
+          member.port = {HTTP: 80}[model.spec.pool.protocol];
         }
       });
     }

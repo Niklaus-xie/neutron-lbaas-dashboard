@@ -1,0 +1,164 @@
+<div class="ng-wizard" ng-form="wizardForm">
+  <div class="modal-header">
+    <button type="button" class="close" ng-click="ctrl.cancel()" aria-hidden="true" aria-label="Close">
+      <span aria-hidden="true" class="fa fa-close"></span>
+    </button>
+    <span class="h4 modal-title">Create SSL Certificate</span>
+  </div>
+
+  <div class="modal-body">
+    
+    <p translate>
+      SSL Certificates are used by Load Balancers to offload SSL decryption. 
+      Create the new SSL Certificate of your own which would be deployed on the load balancer.
+    </p>
+
+    <div class="row">
+      <div class="col-sm-6">
+
+        <!-- certificate name -->
+        <div class="form-group" 
+            ng-class="{'has-error': wizardForm.cert_name.$viewValue !== '' 
+            && (ctrl.doesCertificateExist() || wizardForm.cert_name.$invalid) }">
+          <label class="control-label" for="cert_name" translate>
+            Certificate Name
+            <span class="hz-icon-required fa fa-asterisk"></span>
+          </label>
+          <div class=" ">
+            <input class="form-control" name="cert_name"
+                  id="cert_name"
+                  ng-model="ctrl.certificateSpec.certificate.name"
+                  ng-required="true"
+                  ng-pattern="/^[a-zA-Z0-9-._]+$/"
+                  ng-change="ctrl.hidePassword()"
+                  ng-blur="ctrl.afterCertName()">
+          </div>
+          
+          <span class="help-block"
+                ng-show="wizardForm.cert_name.$viewValue !== '' 
+                && (ctrl.doesCertificateExist() || wizardForm.cert_name.$invalid)">
+            {$ ctrl.certNameError $}
+          </span>
+        </div>
+
+        <!-- certificate -->
+        <div class="form-group"
+            ng-class="{'has-error': wizardForm.certificate.$viewValue !== '' && wizardForm.certificate.$invalid }">
+          <label class="control-label" for="certificate" translate>
+            Certificate
+            <span class="hz-icon-required fa fa-asterisk"></span>
+          </label>
+          <div class=" ">
+            <textarea class="form-control" name="certificate"
+                      id="certificate"
+                      ng-model="ctrl.certificateSpec.certificate.payload"
+                      ng-required="true"
+                      ng-pattern="/^-----BEGIN CERTIFICATE-----\n([a-zA-Z0-9+/=]{1,64}\n)+-----END CERTIFICATE-----$/"
+                      cols="40" rows="3"></textarea>
+          </div>
+
+          <span class="help-block"
+                ng-show="wizardForm.certificate.$viewValue !== '' && wizardForm.certificate.$invalid">
+            {$ ctrl.certificateError $}
+          </span>
+        </div>
+
+        <!-- private key -->
+        <div class="form-group"
+            ng-class="{'has-error':  wizardForm.private_key.$viewValue !== '' && wizardForm.private_key.$invalid }">
+          <label class="control-label" for="private_key" translate>
+            Private Key
+            <span class="hz-icon-required fa fa-asterisk"></span>
+          </label>
+          <div class=" ">
+            <textarea class="form-control" name="private_key" 
+                      id="private_key" 
+                      ng-model="ctrl.certificateSpec.private_key.payload"
+                      ng-required="true"
+                      ng-pattern="/^-----BEGIN (RSA\s|ENCRYPTED\s|)PRIVATE KEY-----\n([a-zA-Z0-9+/=]{1,64}\n)+-----END (RSA\s|ENCRYPTED\s|)PRIVATE KEY-----$/"
+                      cols="40" rows="3"></textarea>
+          </div>
+
+          <span class="help-block"
+                ng-show="wizardForm.private_key.$viewValue !== '' && wizardForm.private_key.$invalid">
+            {$ ctrl.privateKeyError $}
+          </span>
+
+        </div>
+
+        <!-- passphrase -->
+        <div class="form-group">
+          <label class="control-label" for="passphrase" translate>
+            Passphrase
+          </label>
+          <div class="has-feedback">
+            <div ng-switch="ctrl.passType">
+              <div ng-switch-when="password">
+                <input type="password" class="form-control" name="passphrase"
+                      id="passphrase"
+                      ng-model="ctrl.certificateSpec.passphrase.payload">
+              </div>
+              <div ng-switch-when="text">
+                  <input type="text" class="form-control" name="passphrase"
+                        id="passphrase"
+                        ng-model="ctrl.certificateSpec.passphrase.payload" >
+                </div>
+            </div>
+            <span class="form-control-feedback fa fa-eye password-icon" 
+                  ng-mousedown="ctrl.revealPassword()"
+                  ng-mouseup="ctrl.hidePassword()"></span>
+          </div>
+        </div>
+        
+        <!-- intermediate -->
+        <div class="form-group"
+            ng-class="{'has-error': wizardForm.intermediate.$viewValue !== '' && wizardForm.intermediate.$invalid }">
+          <label class="control-label" for="intermediate" translate>
+            Certificate Chain (Optional)
+            <span class="hz-icon-required fa fa-question-circle"></span>
+          </label>
+          <div class="has-feedback">
+            <textarea class="form-control" name="intermediate"
+                      id="intermediate" 
+                      ng-model="ctrl.certificateSpec.intermediate.payload" 
+                      ng-pattern="/^(-----BEGIN PKCS7-----\n([a-zA-Z0-9+/=]{1,64}\n)+-----END PKCS7-----|(-----BEGIN CERTIFICATE-----\n([a-zA-Z0-9+/=]{1,64}\n)+-----END CERTIFICATE-----(\n)?)+)$/"
+                      cols="40" rows="3"></textarea>
+          </div>
+
+          <span class="help-block"
+              ng-show="wizardForm.intermediate.$viewValue !== '' && wizardForm.intermediate.$invalid">
+            {$ ctrl.intermediateError $}
+          </span>
+
+        </div>
+
+      </div>
+      <div class="col-sm-6">
+        <p></p>
+        <p>For secure website or application using Load Balancers to offload SSL decryption requires SSL server certificate installed on the load balancer.</p>
+        <p>If you do not have individual SSL certificate requirements (including custom vanity domains) for your secure website or application, you can choose to use the common certificate that we provide.</p>
+        <p>For individual SSL certificates, if you already have a SSL certificate and want to upload it; please specify the following details:</p>
+        <p><b>Certificate Name</b> – Supply a certificate name (i.e. my_server_cert), pattern: ^[a-zA-Z0-9-._]+$</p>
+        <p><b>Certificate</b> - Copy and paste the contents of the certificate file in the Certificate field.</p>
+        <p><b>Private Key</b> - Copy and paste the contents of the private key file in the Private Key field.</p>
+        <p><b>Passphrase</b> - Input the passphrase if exists into the Passphrase field.</p>
+        <p><b>Certificate Chain</b> – Optional - Copy and paste the contents of the public key certificate chain file in the Certificate Chain field.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn btn-default pull-left" 
+            ng-click="ctrl.cancel()"
+            ng-disabled="ctrl.statusCreating">
+      <span class="fa fa-close"></span>
+      <translate>Cancel</translate>
+    </button>
+
+    <button class="btn btn-primary"
+            ng-click="ctrl.submit()"
+            ng-disabled="wizardForm.$invalid || ctrl.doesCertificateExist() || ctrl.statusCreating">
+      <translate>Create</translate>
+    </button>
+  </div>
+</div>

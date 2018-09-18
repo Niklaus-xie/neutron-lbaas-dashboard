@@ -63,6 +63,15 @@ class SSLCertificates(generic.View):
         result = containers._api.get('containers', params=params)
         return {'items': result.get('containers')}
 
+    @rest_utils.ajax()
+    def post(self, request):
+        """Create certificate container.
+
+        The result is an object with property "container_ref".
+        """
+        containers = barbicanclient(request).containers
+        return containers._api.post("containers", json=request.DATA)
+
 
 @urls.register
 class Secrets(generic.View):
@@ -82,3 +91,12 @@ class Secrets(generic.View):
         params = {'limit': limit}
         result = secrets._api.get('secrets', params=params)
         return {'items': result.get('secrets')}
+
+    @rest_utils.ajax()
+    def post(self, request):
+        """Create secret
+
+        The result is an object with property "secret_ref"
+        """
+        secrets = barbicanclient(request).secrets
+        return secrets._api.post('secrets', json=request.DATA)
