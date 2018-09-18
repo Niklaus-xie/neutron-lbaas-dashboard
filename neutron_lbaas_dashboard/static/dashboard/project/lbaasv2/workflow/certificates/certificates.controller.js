@@ -22,6 +22,8 @@
 
   CertificatesController.$inject = [
     '$scope',
+    '$modal',
+    'horizon.dashboard.project.lbaasv2.basePath',
     'horizon.framework.util.i18n.gettext'
   ];
 
@@ -36,9 +38,11 @@
    * @returns undefined
    */
 
-  function CertificatesController($scope, gettext) {
+  function CertificatesController($scope, $modal, basePath, gettext) {
 
     var ctrl = this;
+
+    ctrl.createSSLCertificate = createSSLCertificate;
 
     ctrl.tableData = {
       available: $scope.model.certificates,
@@ -56,5 +60,34 @@
       noneAllocText: gettext('Select certificates from the available certificates below'),
       noneAvailText: gettext('No available certificates')
     };
+
+    /**
+     * @ngdoc function
+     * @name createSSLCertificate
+     * @description
+     * Create a new SSL Certificate for TERMINATED_HTTPS protocol
+     * @returns {undefined} undefined
+     */
+    function createSSLCertificate() {
+      $modal.open({
+        templateUrl: basePath + 'workflow/certificates/create-certificate.html',
+        controller: 'LaunchLoadBalancerCreateCertificateController as ctrl',
+        windowClass: 'modal-dialog-wizard',
+        resolve: {
+          certificateModel: getModel
+        }
+      });
+    }
+
+     /**
+     * @ngdoc function
+     * @name getModel
+     * @description
+     * Pass the model to ssl certificate creation controller.
+     * @returns {model} certificate model
+     */
+    function getModel() {
+      return $scope.model;
+    }
   }
 })();

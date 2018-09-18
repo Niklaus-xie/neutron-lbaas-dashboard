@@ -97,7 +97,8 @@
        */
 
       initialize: initialize,
-      submit: submit
+      submit: submit,
+      prepareCertificates: prepareCertificates
     };
 
     return model;

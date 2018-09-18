@@ -21,6 +21,7 @@
     .factory('horizon.app.core.openstack-service-api.barbican', barbicanAPI);
 
   barbicanAPI.$inject = [
+    '$q',
     'horizon.framework.util.http.service',
     'horizon.framework.widgets.toast.service'
   ];
@@ -34,10 +35,12 @@
    * @returns The barbican service API.
    */
 
-  function barbicanAPI(apiService, toastService) {
+  function barbicanAPI($q, apiService, toastService) {
     var service = {
       getCertificates: getCertificates,
-      getSecrets: getSecrets
+      createCertificate: createCertificate,
+      getSecrets: getSecrets,
+      createSecret: createSecret
     };
 
     return service;
@@ -82,5 +85,56 @@
       });
     }
 
+    /**
+     * @name horizon.app.core.openstack-service-api.barbican.createSecret
+     * @description
+     * Create the new secret.
+     * @param {object} spec
+     * The result is an object with property "secret_ref".
+     * @returns promise of createSecret.
+     */
+
+    function createSecret(spec) {
+      var deferred = $q.defer();
+      var promise = deferred.promise;
+
+      apiService.post('/api/barbican/secrets/', spec).then(
+        function(result) {
+          deferred.resolve(result);
+        },
+        function (reason) {
+          toastService.add('error', gettext('Unable to create secret.'));
+          deferred.reject(reason);
+        }
+      );
+
+      return promise;
+    }
+
+    /**
+     * @name horizon.app.core.openstack-service-api.barbican.createCertificate
+     * @description
+     * Create the new SSL Certificate container.
+     * @param {object} spec
+     * The result is an object with property "container_ref".
+     * @returns promise of create container
+     */
+
+    function createCertificate(spec) {
+      var deferred = $q.defer();
+      var promise = deferred.promise;
+
+      apiService.post('/api/barbican/certificates/', spec).then(
+        function (result) {
+          deferred.resolve(result);
+        },
+        function(reason) {
+          toastService.add('error', gettext('Unable to create certificate.'));
+          deferred.reject(reason);
+        }
+      );
+
+      return promise;
+    }
   }
 }());

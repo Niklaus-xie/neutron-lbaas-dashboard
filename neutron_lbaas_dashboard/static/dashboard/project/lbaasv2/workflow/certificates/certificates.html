@@ -1,6 +1,12 @@
 <div ng-controller="CertificatesController as ctrl">
   <p translate>Select one or more SSL certificates for the listener.</p>
 
+  <button type="button" class="btn btn-default"
+          ng-click="ctrl.createSSLCertificate()">
+    <span class="fa fa-plus"></span>
+    <translate>Create SSL Certificate</translate>
+  </button>
+
   <transfer-table tr-model="ctrl.tableData"
                   limits="::ctrl.tableLimits"
                   help-text="::ctrl.tableHelp">
